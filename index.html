@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nourish</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nourish" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --surface: #181818;
+      --surface2: #222222;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #f0ede6;
+      --text2: #888882;
+      --text3: #555550;
+      --accent: #c8f060;
+      --accent-dim: rgba(200,240,96,0.12);
+      --accent-text: #0e0e0e;
+      --red: #ff5c5c;
+      --red-dim: rgba(255,92,92,0.1);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
+
+    .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+
+    /* ── top bar ── */
+    .topbar { padding: calc(var(--safe-top) + 14px) 20px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .topbar-title { font-family: 'DM Serif Display', serif; font-size: 26px; letter-spacing: -0.02em; color: var(--text); }
+    .topbar-date { font-size: 13px; color: var(--text2); }
+    .topbar-actions { display: flex; gap: 8px; }
+    .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); transition: background 0.15s, color 0.15s; }
+    .icon-btn:hover, .icon-btn:active { background: var(--surface2); color: var(--text); }
+
+    /* ── scrollable content ── */
+    .content { flex: 1; overflow-y: auto; padding: 0 16px 120px; -webkit-overflow-scrolling: touch; }
+
+    /* ── macro ring summary ── */
+    .summary-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 20px; }
+    .ring-wrap { position: relative; flex-shrink: 0; width: 88px; height: 88px; }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-cal { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; }
+    .ring-label { font-size: 10px; color: var(--text2); margin-top: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .macro-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .macro-row { display: flex; align-items: center; gap: 8px; }
+    .macro-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .macro-name { font-size: 12px; color: var(--text2); flex: 1; }
+    .macro-val { font-size: 14px; font-weight: 500; color: var(--text); }
+    .macro-unit { font-size: 11px; color: var(--text3); }
+
+    /* ── water ── */
+    .water-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 18px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+    .water-icon { font-size: 22px; }
+    .water-info { flex: 1; }
+    .water-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .water-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .water-bar { height: 4px; background: var(--surface2); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .water-fill { height: 100%; background: #60c8f0; border-radius: 2px; transition: width 0.3s ease; }
+    .water-controls { display: flex; align-items: center; gap: 10px; }
+    .w-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border2); background: transparent; color: var(--text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .w-btn:active { background: var(--surface2); }
+    .w-count { font-size: 16px; font-weight: 500; min-width: 20px; text-align: center; }
+
+    /* ── meal sections ── */
+    .meal-section { margin-bottom: 6px; }
+    .meal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 4px 8px; }
+    .meal-name { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); }
+    .meal-cal { font-size: 12px; color: var(--text3); }
+    .entry-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; animation: slideIn 0.2s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .entry-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .entry-portion { font-size: 12px; color: var(--text2); }
+    .entry-right { text-align: right; flex-shrink: 0; }
+    .entry-cal { font-size: 15px; font-weight: 500; color: var(--text); }
+    .entry-macros { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .entry-del { font-size: 11px; color: var(--red); cursor: pointer; margin-top: 5px; display: block; opacity: 0.7; }
+    .entry-del:hover { opacity: 1; }
+    .empty-state { text-align: center; padding: 32px 20px; color: var(--text3); font-size: 14px; }
+
+    /* ── bottom bar ── */
+    .bottombar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: linear-gradient(to top, var(--bg) 70%, transparent); padding: calc(12px) 20px calc(var(--safe-bottom) + 20px); z-index: 100; }
+    .input-row { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border2); border-radius: 999px; padding: 8px 8px 8px 18px; }
+    .text-input { flex: 1; background: transparent; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); }
+    .text-input::placeholder { color: var(--text3); }
+    .meal-pill { font-size: 11px; font-weight: 500; background: var(--surface2); color: var(--text2); border-radius: 20px; padding: 4px 10px; cursor: pointer; white-space: nowrap; border: 1px solid var(--border); flex-shrink: 0; }
+    .send-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: opacity 0.15s, transform 0.1s; }
+    .send-btn:active { transform: scale(0.93); }
+    .send-btn svg { color: var(--accent-text); }
+    .mic-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
+    .mic-btn.recording { background: var(--red-dim); border-color: var(--red); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,92,92,0.3); } 50% { box-shadow: 0 0 0 8px rgba(255,92,92,0); } }
+
+    /* ── meal picker sheet ── */
+    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+    .sheet-overlay.open { display: flex; }
+    .sheet { width: 100%; max-width: 480px; background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 16px 16px calc(var(--safe-bottom) + 24px); }
+    .sheet-title { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 14px; }
+    .sheet-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sheet-opt { padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface2); font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; text-align: center; transition: background 0.15s; }
+    .sheet-opt.active { border-color: var(--accent); color: var(--accent); }
+    .sheet-opt:active { background: var(--bg); }
+
+    /* ── settings overlay ── */
+    .settings-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: none; flex-direction: column; }
+    .settings-overlay.open { display: flex; }
+    .settings-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .settings-back { cursor: pointer; color: var(--text2); display: flex; }
+    .settings-title { font-family: 'DM Serif Display', serif; font-size: 22px; }
+    .settings-body { flex: 1; overflow-y: auto; padding: 24px 20px; }
+    .settings-section { margin-bottom: 28px; }
+    .settings-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+    .settings-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; }
+    .settings-row label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 8px; }
+    .settings-row input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); outline: none; }
+    .settings-row input:focus { border-color: var(--accent); }
+    .settings-save-btn { width: 100%; padding: 14px; background: var(--accent); color: var(--accent-text); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+    .settings-save-btn:active { opacity: 0.85; }
+    .status-msg { font-size: 13px; margin-top: 10px; text-align: center; }
+    .status-msg.ok { color: var(--accent); }
+    .status-msg.err { color: var(--red); }
+
+    /* ── scan overlay ── */
+    .scan-overlay { position: fixed; inset: 0; background: #000; z-index: 300; display: none; flex-direction: column; align-items: center; }
+    .scan-overlay.open { display: flex; }
+    .scan-video { width: 100%; height: 100%; object-fit: cover; }
+    .scan-ui { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .scan-frame { width: 260px; height: 140px; border: 2px solid var(--accent); border-radius: 12px; position: relative; }
+    .scan-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); top: 50%; animation: scanline 2s ease-in-out infinite; }
+    @keyframes scanline { 0%,100% { top: 10%; } 50% { top: 90%; } }
+    .scan-hint { color: #fff; font-size: 14px; margin-top: 24px; opacity: 0.8; }
+    .scan-close { position: absolute; top: calc(var(--safe-top) + 16px); right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .scan-status { position: absolute; bottom: calc(var(--safe-bottom) + 40px); font-size: 14px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px 18px; border-radius: 20px; }
+
+    /* ── loading ── */
+    .parsing-bar { height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); background-size: 200% 100%; animation: shimmer 1.2s infinite; display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999; }
+    .parsing-bar.show { display: block; }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+    /* scrollbar */
+    .content::-webkit-scrollbar { width: 3px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  </style>
+</head>
+<body>
+<div class="parsing-bar" id="parsing-bar"></div>
+
+<div class="app">
+  <!-- top bar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Nourish</div>
+      <div class="topbar-date" id="today-date"></div>
+    </div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="openScan()" title="Scan barcode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="13" y1="8" x2="13" y2="16"/><line x1="16" y1="8" x2="16" y2="16"/></svg>
+      </div>
+      <div class="icon-btn" onclick="openSettings()" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- scrollable content -->
+  <div class="content" id="content">
+    <!-- macro summary -->
+    <div class="summary-card">
+      <div class="ring-wrap">
+        <svg width="88" height="88" viewBox="0 0 88 88">
+          <circle cx="44" cy="44" r="36" fill="none" stroke="#222" stroke-width="7"/>
+          <circle id="ring-protein" cx="44" cy="44" r="36" fill="none" stroke="#60c8f0" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+          <circle id="ring-carbs" cx="44" cy="44" r="36" fill="none" stroke="#f0c060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+          <circle id="ring-fat" cx="44" cy="44" r="36" fill="none" stroke="#f06060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+          <circle id="ring-cal" cx="44" cy="44" r="36" fill="none" stroke="#c8f060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-cal" id="total-cal">0</div>
+          <div class="ring-label">kcal</div>
+        </div>
+      </div>
+      <div class="macro-list">
+        <div class="macro-row"><div class="macro-dot" style="background:#60c8f0"></div><span class="macro-name">Protein</span><span class="macro-val" id="total-protein">0</span><span class="macro-unit">g</span></div>
+        <div class="macro-row"><div class="macro-dot" style="background:#f0c060"></div><span class="macro-name">Carbs</span><span class="macro-val" id="total-carbs">0</span><span class="macro-unit">g</span></div>
+        <div class="macro-row"><div class="macro-dot" style="background:#f06060"></div><span class="macro-name">Fat</span><span class="macro-val" id="total-fat">0</span><span class="macro-unit">g</span></div>
+      </div>
+    </div>
+
+    <!-- water -->
+    <div class="water-card">
+      <div class="water-icon">💧</div>
+      <div class="water-info">
+        <div class="water-title">Water</div>
+        <div class="water-sub" id="water-sub">0 of 8 glasses</div>
+        <div class="water-bar"><div class="water-fill" id="water-fill" style="width:0%"></div></div>
+      </div>
+      <div class="water-controls">
+        <button class="w-btn" onclick="adjustWater(-1)">−</button>
+        <span class="w-count" id="water-count">0</span>
+        <button class="w-btn" onclick="adjustWater(1)">+</button>
+      </div>
+    </div>
+
+    <!-- meal log -->
+    <div id="log-container"></div>
+  </div>
+
+  <!-- bottom input bar -->
+  <div class="bottombar">
+    <div class="input-row">
+      <div class="meal-pill" id="meal-pill" onclick="openMealPicker()">Breakfast ▾</div>
+      <input class="text-input" id="text-input" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')submitText()" />
+      <button class="mic-btn" id="mic-btn" onclick="toggleMic()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <button class="send-btn" onclick="submitText()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- meal picker sheet -->
+<div class="sheet-overlay" id="meal-sheet" onclick="closeMealPicker(event)">
+  <div class="sheet">
+    <div class="sheet-title">Select meal</div>
+    <div class="sheet-options">
+      <div class="sheet-opt active" onclick="selectMeal('Breakfast')">Breakfast</div>
+      <div class="sheet-opt" onclick="selectMeal('Lunch')">Lunch</div>
+      <div class="sheet-opt" onclick="selectMeal('Dinner')">Dinner</div>
+      <div class="sheet-opt" onclick="selectMeal('Snack')">Snack</div>
+    </div>
+  </div>
+</div>
+
+<!-- settings overlay -->
+<div class="settings-overlay" id="settings-overlay">
+  <div class="settings-header">
+    <div class="settings-back" onclick="closeSettings()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="settings-title">Settings</div>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-label">API key</div>
+      <div class="settings-row">
+        <label>Anthropic API key (stored in your browser only)</label>
+        <input type="password" id="settings-key" placeholder="sk-ant-..." />
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">Daily goals</div>
+      <div class="settings-row">
+        <label>Calorie goal (kcal)</label>
+        <input type="number" id="goal-cal" value="2000" />
+      </div>
+      <div class="settings-row">
+        <label>Water goal (glasses)</label>
+        <input type="number" id="goal-water" value="8" />
+      </div>
+    </div>
+    <button class="settings-save-btn" onclick="saveSettings()">Save settings</button>
+    <div class="status-msg" id="settings-status"></div>
+  </div>
+</div>
+
+<!-- barcode scan overlay -->
+<div class="scan-overlay" id="scan-overlay">
+  <video class="scan-video" id="scan-video" autoplay playsinline muted></video>
+  <div class="scan-ui">
+    <div class="scan-frame"><div class="scan-line"></div></div>
+    <div class="scan-hint">Point at a barcode</div>
+  </div>
+  <div class="scan-close" onclick="closeScan()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </div>
+  <div class="scan-status" id="scan-status">Scanning...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/umd/index.min.js"></script>
+<script>
+// ── state ──
+let apiKey = localStorage.getItem('nourish_key') || '';
+let goalCal = parseInt(localStorage.getItem('nourish_goal_cal') || '2000');
+let goalWater = parseInt(localStorage.getItem('nourish_goal_water') || '8');
+let currentMeal = 'Breakfast';
+let waterCount = 0;
+let entries = [];
+let recognition = null;
+let isRecording = false;
+let scanReader = null;
+let scanStream = null;
+
+const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+
+// ── init ──
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+if (apiKey) document.getElementById('settings-key').value = apiKey;
+loadDay();
+renderAll();
+
+// ── persistence ──
+function todayKey() { return 'nourish_' + new Date().toISOString().slice(0,10); }
+
+function loadDay() {
+  const saved = localStorage.getItem(todayKey());
+  if (saved) {
+    const d = JSON.parse(saved);
+    entries = d.entries || [];
+    waterCount = d.water || 0;
+  }
+}
+
+function saveDay() {
+  localStorage.setItem(todayKey(), JSON.stringify({ entries, water: waterCount }));
+}
+
+// ── render ──
+function renderAll() {
+  renderSummary();
+  renderWater();
+  renderLog();
+}
+
+function renderSummary() {
+  const totals = entries.reduce((a, e) => ({
+    cal: a.cal + (e.calories||0),
+    protein: a.protein + (e.protein||0),
+    carbs: a.carbs + (e.carbs||0),
+    fat: a.fat + (e.fat||0)
+  }), {cal:0,protein:0,carbs:0,fat:0});
+
+  document.getElementById('total-cal').textContent = Math.round(totals.cal);
+  document.getElementById('total-protein').textContent = Math.round(totals.protein);
+  document.getElementById('total-carbs').textContent = Math.round(totals.carbs);
+  document.getElementById('total-fat').textContent = Math.round(totals.fat);
+
+  const circ = 226;
+  const pct = Math.min(totals.cal / goalCal, 1);
+  document.getElementById('ring-cal').style.strokeDashoffset = Math.round(circ - pct * circ);
+
+  const totalMacroG = totals.protein + totals.carbs + totals.fat || 1;
+  document.getElementById('ring-protein').style.strokeDashoffset = Math.round(circ - (totals.protein/totalMacroG)*circ*0.9);
+  document.getElementById('ring-carbs').style.strokeDashoffset = Math.round(circ - (totals.carbs/totalMacroG)*circ*0.85);
+  document.getElementById('ring-fat').style.strokeDashoffset = Math.round(circ - (totals.fat/totalMacroG)*circ*0.8);
+}
+
+function renderWater() {
+  document.getElementById('water-count').textContent = waterCount;
+  document.getElementById('water-sub').textContent = `${waterCount} of ${goalWater} glasses`;
+  document.getElementById('water-fill').style.width = Math.min(waterCount/goalWater*100,100).toFixed(0) + '%';
+}
+
+function renderLog() {
+  const container = document.getElementById('log-container');
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty-state">No entries yet — tap the mic or type below</div>';
+    return;
+  }
+  let html = '';
+  MEALS.forEach(meal => {
+    const me = entries.filter(e => e.meal === meal);
+    if (!me.length) return;
+    const mealCal = me.reduce((a,e) => a+(e.calories||0), 0);
+    html += `<div class="meal-section">
+      <div class="meal-header">
+        <span class="meal-name">${meal}</span>
+        <span class="meal-cal">${Math.round(mealCal)} kcal</span>
+      </div>`;
+    me.forEach(e => {
+      html += `<div class="entry-card">
+        <div class="entry-left">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-portion">${e.portion||''}</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-cal">${Math.round(e.calories||0)} kcal</div>
+          <div class="entry-macros">P ${Math.round(e.protein||0)}g · C ${Math.round(e.carbs||0)}g · F ${Math.round(e.fat||0)}g</div>
+          <span class="entry-del" onclick="deleteEntry(${e.id})">remove</span>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ── meal picker ──
+function openMealPicker() {
+  document.getElementById('meal-sheet').classList.add('open');
+}
+function closeMealPicker(e) {
+  if (e.target === document.getElementById('meal-sheet')) {
+    document.getElementById('meal-sheet').classList.remove('open');
+  }
+}
+function selectMeal(meal) {
+  currentMeal = meal;
+  document.getElementById('meal-pill').textContent = meal + ' ▾';
+  document.querySelectorAll('.sheet-opt').forEach(o => {
+    o.classList.toggle('active', o.textContent === meal);
+  });
+  document.getElementById('meal-sheet').classList.remove('open');
+}
+
+// ── settings ──
+function openSettings() { document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+function saveSettings() {
+  const key = document.getElementById('settings-key').value.trim();
+  if (key && !key.startsWith('sk-ant-')) {
+    showSettingsStatus('Key should start with sk-ant-', false);
+    return;
+  }
+  if (key) { apiKey = key; localStorage.setItem('nourish_key', key); }
+  goalCal = parseInt(document.getElementById('goal-cal').value) || 2000;
+  goalWater = parseInt(document.getElementById('goal-water').value) || 8;
+  localStorage.setItem('nourish_goal_cal', goalCal);
+  localStorage.setItem('nourish_goal_water', goalWater);
+  showSettingsStatus('Saved!', true);
+  renderAll();
+}
+function showSettingsStatus(msg, ok) {
+  const el = document.getElementById('settings-status');
+  el.textContent = msg;
+  el.className = 'status-msg ' + (ok ? 'ok' : 'err');
+  setTimeout(() => el.textContent = '', 3000);
+}
+
+// ── voice ──
+function toggleMic() {
+  if (isRecording) stopMic();
+  else startMic();
+}
+
+function startMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice not supported in this browser. Use the text input.');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  let finalText = '';
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    document.getElementById('text-input').value = finalText + interim;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    const text = document.getElementById('text-input').value.trim();
+    if (text) analyzeFood(text);
+  };
+  recognition.onerror = () => {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+  };
+  recognition.start();
+  isRecording = true;
+  document.getElementById('mic-btn').classList.add('recording');
+}
+
+function stopMic() {
+  if (recognition) recognition.stop();
+  isRecording = false;
+  document.getElementById('mic-btn').classList.remove('recording');
+}
+
+// ── text submit ──
+function submitText() {
+  const input = document.getElementById('text-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  analyzeFood(text);
+}
+
+// ── AI food parsing ──
+async function analyzeFood(text) {
+  if (!apiKey) {
+    openSettings();
+    document.getElementById('settings-status').textContent = 'Enter your API key first';
+    document.getElementById('settings-status').className = 'status-msg err';
+    return;
+  }
+  showLoading(true);
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: `You are a nutrition expert. Parse this food description and return ONLY a valid JSON object with no markdown, no backticks, no explanation:
+{"name":"concise food name","portion":"serving description","calories":number,"protein":number,"carbs":number,"fat":number}
+All numbers must be integers. Estimate realistic values for the described portion.
+Food: "${text}"`
+        }]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content[0].text.trim().replace(/```[a-z]*|```/g,'').trim();
+    const parsed = JSON.parse(raw);
+    addEntry(parsed);
+  } catch(e) {
+    alert('Could not analyze food. Check your API key in Settings.');
+  }
+  showLoading(false);
+}
+
+function addEntry(food) {
+  entries.push({ ...food, meal: currentMeal, id: Date.now() });
+  saveDay();
+  renderAll();
+  // scroll to bottom of log
+  setTimeout(() => {
+    const c = document.getElementById('content');
+    c.scrollTop = c.scrollHeight;
+  }, 100);
+}
+
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  saveDay();
+  renderAll();
+}
+
+// ── water ──
+function adjustWater(delta) {
+  waterCount = Math.max(0, Math.min(20, waterCount + delta));
+  saveDay();
+  renderWater();
+}
+
+// ── loading ──
+function showLoading(show) {
+  document.getElementById('parsing-bar').classList.toggle('show', show);
+}
+
+// ── barcode scan ──
+async function openScan() {
+  if (!window.ZXing) { alert('Barcode library not loaded yet, try again.'); return; }
+  document.getElementById('scan-overlay').classList.add('open');
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.getElementById('scan-video');
+    video.srcObject = scanStream;
+    const hints = new Map();
+    const formats = [
+      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.UPC_A
+    ];
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+    scanReader = new ZXing.BrowserMultiFormatReader(hints);
+    scanReader.decodeFromVideoDevice(null, 'scan-video', (result, err) => {
+      if (result) {
+        const barcode = result.getText();
+        closeScan();
+        lookupBarcode(barcode);
+      }
+    });
+  } catch(e) {
+    document.getElementById('scan-status').textContent = 'Camera access denied';
+  }
+}
+
+function closeScan() {
+  document.getElementById('scan-overlay').classList.remove('open');
+  if (scanReader) { scanReader.reset(); scanReader = null; }
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  document.getElementById('scan-status').textContent = 'Scanning...';
+}
+
+async function lookupBarcode(barcode) {
+  showLoading(true);
+  document.getElementById('scan-status').textContent = 'Looking up ' + barcode + '...';
+  try {
+    const resp = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+    const data = await resp.json();
+    if (data.status !== 1 || !data.product) throw new Error('Not found');
+    const p = data.product;
+    const n = p.nutriments || {};
+    const name = p.product_name || p.generic_name || 'Unknown product';
+    const serving = p.serving_size || '100g';
+    const mult = parseServingMultiplier(serving);
+    addEntry({
+      name,
+      portion: serving,
+      calories: Math.round((n['energy-kcal_100g']||0) * mult),
+      protein: Math.round((n.proteins_100g||0) * mult),
+      carbs: Math.round((n.carbohydrates_100g||0) * mult),
+      fat: Math.round((n.fat_100g||0) * mult)
+    });
+  } catch(e) {
+    // fallback: ask AI with just the barcode
+    await analyzeFood('Product with barcode ' + barcode + ', estimate average values for a typical packaged food serving');
+  }
+  showLoading(false);
+}
+
+function parseServingMultiplier(servingStr) {
+  const match = servingStr.match(/(\d+\.?\d*)/);
+  if (!match) return 1;
+  const grams = parseFloat(match[1]);
+  return grams / 100;
+}
+
+// ── service worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
