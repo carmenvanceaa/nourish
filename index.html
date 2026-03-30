@@ -145,6 +145,32 @@
     .scan-close { position: absolute; top: calc(var(--safe-top) + 16px); right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .scan-status { position: absolute; bottom: calc(var(--safe-bottom) + 40px); font-size: 14px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px 18px; border-radius: 20px; }
 
+    /* ── history overlay ── */
+    .history-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: none; flex-direction: column; }
+    .history-overlay.open { display: flex; }
+    .history-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .history-back { cursor: pointer; color: var(--text2); display: flex; }
+    .history-title { font-family: 'DM Serif Display', serif; font-size: 22px; }
+    .history-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .history-day { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; cursor: pointer; }
+    .history-day-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .history-day-date { font-size: 15px; font-weight: 500; color: var(--text); }
+    .history-day-meta { font-size: 13px; color: var(--text2); }
+    .history-day-cal { font-size: 15px; font-weight: 500; color: var(--accent); }
+    .history-day-entries { border-top: 1px solid var(--border); padding: 10px 16px; display: none; }
+    .history-day.expanded .history-day-entries { display: block; }
+    .history-day.expanded .history-chevron { transform: rotate(180deg); }
+    .history-chevron { transition: transform 0.2s; color: var(--text3); }
+    .history-entry-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .history-entry-row:last-child { border-bottom: none; }
+    .history-entry-name { font-size: 13px; color: var(--text); }
+    .history-entry-meal { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .history-entry-cal { font-size: 13px; color: var(--text2); }
+    .history-macros { display: flex; gap: 12px; padding: 10px 0 4px; border-top: 1px solid var(--border); margin-top: 6px; }
+    .history-macro { font-size: 12px; color: var(--text2); }
+    .history-macro span { color: var(--text); font-weight: 500; }
+    .history-empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 14px; }
+
     /* ── loading ── */
     .parsing-bar { height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); background-size: 200% 100%; animation: shimmer 1.2s infinite; display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999; }
     .parsing-bar.show { display: block; }
@@ -167,6 +193,9 @@
       <div class="topbar-date" id="today-date"></div>
     </div>
     <div class="topbar-actions">
+      <div class="icon-btn" onclick="openHistory()" title="History">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
       <div class="icon-btn" onclick="openScan()" title="Scan barcode">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="13" y1="8" x2="13" y2="16"/><line x1="16" y1="8" x2="16" y2="16"/></svg>
       </div>
@@ -290,6 +319,17 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </div>
   <div class="scan-status" id="scan-status">Scanning...</div>
+</div>
+
+<!-- history overlay -->
+<div class="history-overlay" id="history-overlay">
+  <div class="history-header">
+    <div class="history-back" onclick="closeHistory()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="history-title">History</div>
+  </div>
+  <div class="history-body" id="history-body"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/umd/index.min.js"></script>
@@ -633,6 +673,88 @@ function parseServingMultiplier(servingStr) {
   if (!match) return 1;
   const grams = parseFloat(match[1]);
   return grams / 100;
+}
+
+// ── history ──
+function openHistory() {
+  renderHistory();
+  document.getElementById('history-overlay').classList.add('open');
+}
+
+function closeHistory() {
+  document.getElementById('history-overlay').classList.remove('open');
+}
+
+function renderHistory() {
+  const body = document.getElementById('history-body');
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('nourish_2')) keys.push(k);
+  }
+  keys.sort().reverse();
+
+  if (keys.length === 0) {
+    body.innerHTML = '<div class="history-empty">No past days logged yet</div>';
+    return;
+  }
+
+  let html = '';
+  keys.forEach(key => {
+    const dateStr = key.replace('nourish_', '');
+    const isToday = dateStr === new Date().toISOString().slice(0,10);
+    const d = JSON.parse(localStorage.getItem(key) || '{}');
+    const dayEntries = d.entries || [];
+    const water = d.water || 0;
+    if (dayEntries.length === 0 && water === 0) return;
+
+    const totals = dayEntries.reduce((a, e) => ({
+      cal: a.cal + (e.calories||0),
+      protein: a.protein + (e.protein||0),
+      carbs: a.carbs + (e.carbs||0),
+      fat: a.fat + (e.fat||0)
+    }), {cal:0,protein:0,carbs:0,fat:0});
+
+    const date = new Date(dateStr + 'T12:00:00');
+    const label = isToday ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    html += `<div class="history-day" id="hday-${dateStr}" onclick="toggleHistoryDay('${dateStr}')">
+      <div class="history-day-header">
+        <div>
+          <div class="history-day-date">${label}</div>
+          <div class="history-day-meta">${dayEntries.length} item${dayEntries.length !== 1 ? 's' : ''} · 💧 ${water}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="history-day-cal">${Math.round(totals.cal)} kcal</div>
+          <svg class="history-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="history-day-entries">`;
+
+    dayEntries.forEach(e => {
+      html += `<div class="history-entry-row">
+        <div>
+          <div class="history-entry-name">${e.name}</div>
+          <div class="history-entry-meal">${e.meal} · ${e.portion||''}</div>
+        </div>
+        <div class="history-entry-cal">${Math.round(e.calories||0)} kcal</div>
+      </div>`;
+    });
+
+    html += `<div class="history-macros">
+      <div class="history-macro">P <span>${Math.round(totals.protein)}g</span></div>
+      <div class="history-macro">C <span>${Math.round(totals.carbs)}g</span></div>
+      <div class="history-macro">F <span>${Math.round(totals.fat)}g</span></div>
+    </div>
+    </div></div>`;
+  });
+
+  body.innerHTML = html || '<div class="history-empty">No past days logged yet</div>';
+}
+
+function toggleHistoryDay(dateStr) {
+  const el = document.getElementById('hday-' + dateStr);
+  if (el) el.classList.toggle('expanded');
 }
 
 // ── service worker ──
