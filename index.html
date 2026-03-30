@@ -129,6 +129,8 @@
     .settings-row input:focus { border-color: var(--accent); }
     .settings-save-btn { width: 100%; padding: 14px; background: var(--accent); color: var(--accent-text); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
     .settings-save-btn:active { opacity: 0.85; }
+    .export-btn { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: background 0.15s; }
+    .export-btn:active { background: var(--surface2); }
     .status-msg { font-size: 13px; margin-top: 10px; text-align: center; }
     .status-msg.ok { color: var(--accent); }
     .status-msg.err { color: var(--red); }
@@ -305,6 +307,38 @@
     </div>
     <button class="settings-save-btn" onclick="saveSettings()">Save settings</button>
     <div class="status-msg" id="settings-status"></div>
+
+    <div class="settings-section" style="margin-top:28px;">
+      <div class="settings-label">Backup &amp; restore</div>
+
+      <div class="settings-row">
+        <label>Date range (leave blank for all time)</label>
+        <div style="display:flex;gap:8px;">
+          <input type="date" id="export-from" style="flex:1;" />
+          <input type="date" id="export-to" style="flex:1;" />
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <button class="export-btn" onclick="exportJSON()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export JSON
+        </button>
+        <button class="export-btn" onclick="exportCSV()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+
+      <div class="settings-row" style="border:2px dashed var(--border2);background:transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('import-file').click()">
+        <label style="cursor:pointer;pointer-events:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:block;margin:0 auto 6px;color:var(--text3);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Tap to import JSON backup
+        </label>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importJSON(event)" />
+      </div>
+      <div class="status-msg" id="export-status"></div>
+    </div>
   </div>
 </div>
 
@@ -673,6 +707,111 @@ function parseServingMultiplier(servingStr) {
   if (!match) return 1;
   const grams = parseFloat(match[1]);
   return grams / 100;
+}
+
+// ── export / import ──
+function getAllDayKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('nourish_2')) keys.push(k);
+  }
+  return keys.sort();
+}
+
+function getFilteredKeys() {
+  const from = document.getElementById('export-from').value;
+  const to = document.getElementById('export-to').value;
+  return getAllDayKeys().filter(k => {
+    const d = k.replace('nourish_', '');
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    return true;
+  });
+}
+
+function exportJSON() {
+  const keys = getFilteredKeys();
+  if (!keys.length) { showExportStatus('No data in selected range', false); return; }
+  const backup = {};
+  keys.forEach(k => {
+    backup[k.replace('nourish_', '')] = JSON.parse(localStorage.getItem(k) || '{}');
+  });
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  downloadBlob(blob, `nourish-backup-${today()}.json`);
+  showExportStatus(`Exported ${keys.length} day${keys.length !== 1 ? 's' : ''}`, true);
+}
+
+function exportCSV() {
+  const keys = getFilteredKeys();
+  if (!keys.length) { showExportStatus('No data in selected range', false); return; }
+  const rows = [['Date', 'Meal', 'Food', 'Portion', 'Calories', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Water (glasses)']];
+  keys.forEach(k => {
+    const date = k.replace('nourish_', '');
+    const d = JSON.parse(localStorage.getItem(k) || '{}');
+    const dayEntries = d.entries || [];
+    const water = d.water || 0;
+    if (dayEntries.length === 0) {
+      rows.push([date, '', '', '', '', '', '', '', water]);
+    } else {
+      dayEntries.forEach((e, i) => {
+        rows.push([
+          date, e.meal || '', e.name || '', e.portion || '',
+          e.calories || 0, e.protein || 0, e.carbs || 0, e.fat || 0,
+          i === 0 ? water : ''
+        ]);
+      });
+    }
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  downloadBlob(blob, `nourish-backup-${today()}.csv`);
+  showExportStatus(`Exported ${keys.length} day${keys.length !== 1 ? 's' : ''}`, true);
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      let count = 0;
+      Object.entries(backup).forEach(([date, data]) => {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(date) && data && typeof data === 'object') {
+          localStorage.setItem('nourish_' + date, JSON.stringify(data));
+          count++;
+        }
+      });
+      showExportStatus(`Imported ${count} day${count !== 1 ? 's' : ''} successfully`, true);
+      loadDay();
+      renderAll();
+    } catch {
+      showExportStatus('Invalid backup file', false);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function showExportStatus(msg, ok) {
+  const el = document.getElementById('export-status');
+  el.textContent = msg;
+  el.className = 'status-msg ' + (ok ? 'ok' : 'err');
+  setTimeout(() => el.textContent = '', 4000);
 }
 
 // ── history ──
