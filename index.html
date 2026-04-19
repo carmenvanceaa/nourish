@@ -172,6 +172,80 @@
     .history-macro { font-size: 12px; color: var(--text2); }
     .history-macro span { color: var(--text); font-weight: 500; }
     .history-empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 14px; }
+    .history-add-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 10px; padding: 10px; border-radius: var(--radius-sm); border: 1px dashed var(--border2); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .history-add-btn:active { background: var(--surface2); color: var(--text); }
+    .history-del { font-size: 11px; color: var(--red); cursor: pointer; opacity: 0.7; padding: 2px 0 2px 10px; flex-shrink: 0; }
+    .history-del:hover { opacity: 1; }
+
+    /* ── past day log overlay ── */
+    .pastlog-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 400; display: none; flex-direction: column; }
+    .pastlog-overlay.open { display: flex; }
+    .pastlog-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .pastlog-back { cursor: pointer; color: var(--text2); display: flex; }
+    .pastlog-title { flex: 1; }
+    .pastlog-title-main { font-family: 'DM Serif Display', serif; font-size: 20px; }
+    .pastlog-title-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .pastlog-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .pastlog-input-area { flex-shrink: 0; padding: 12px 16px calc(var(--safe-bottom) + 16px); border-top: 1px solid var(--border); background: var(--bg); }
+    .pastlog-meal-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .pastlog-meal-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .pastlog-meal-btn.active { border-color: var(--accent); color: var(--accent); }
+    .pastlog-row { display: flex; gap: 8px; align-items: center; }
+    .pastlog-input { flex: 1; background: var(--surface); border: 1px solid var(--border2); border-radius: 999px; padding: 10px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); outline: none; }
+    .pastlog-input::placeholder { color: var(--text3); }
+    .pastlog-send { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .pastlog-status { font-size: 12px; color: var(--text2); text-align: center; margin-top: 8px; min-height: 18px; }
+
+    /* ── budget bar (feature 1 & 2) ── */
+    .budget-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px 18px; margin-bottom: 14px; }
+    .budget-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+    .budget-remaining { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text); line-height: 1; }
+    .budget-remaining.danger { color: var(--red); }
+    .budget-remaining.warning { color: #f0c060; }
+    .budget-label { font-size: 12px; color: var(--text2); }
+    .budget-consumed { font-size: 13px; color: var(--text2); }
+    .budget-bar-wrap { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .budget-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.4s ease, background 0.3s; }
+    .budget-bar-fill.warning { background: #f0c060; }
+    .budget-bar-fill.danger { background: var(--red); }
+    .budget-macros { display: flex; gap: 0; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+    .budget-macro { flex: 1; text-align: center; }
+    .budget-macro + .budget-macro { border-left: 1px solid var(--border); }
+    .budget-macro-val { font-size: 15px; font-weight: 500; color: var(--text); }
+    .budget-macro-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .budget-macro-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin: 6px 12px 0; overflow: hidden; }
+    .budget-macro-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+    /* ── streak card (feature 5) ── */
+    .streak-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .streak-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: center; gap: 12px; }
+    .streak-icon { font-size: 24px; line-height: 1; }
+    .streak-num { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); line-height: 1; }
+    .streak-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+    /* ── weekly chart overlay (feature 4) ── */
+    .weekly-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: none; flex-direction: column; }
+    .weekly-overlay.open { display: flex; }
+    .weekly-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .weekly-back { cursor: pointer; color: var(--text2); display: flex; }
+    .weekly-title { font-family: 'DM Serif Display', serif; font-size: 22px; }
+    .weekly-body { flex: 1; overflow-y: auto; padding: 20px 16px; }
+    .weekly-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; margin-bottom: 8px; }
+    .weekly-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .weekly-bar-col { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; }
+    .weekly-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; transition: height 0.4s ease; position: relative; }
+    .weekly-bar.today { background: var(--accent); }
+    .weekly-bar.over { background: var(--red); }
+    .weekly-bar.good { background: #60c8f0; }
+    .weekly-bar.empty { background: var(--surface2); }
+    .weekly-bar-cal { font-size: 10px; color: var(--text3); text-align: center; margin-bottom: 4px; }
+    .weekly-day-label { font-size: 11px; color: var(--text2); margin-top: 6px; }
+    .weekly-goal-line { border-top: 1px dashed var(--border2); margin: 0 0 16px; position: relative; }
+    .weekly-goal-line span { position: absolute; right: 0; top: -9px; font-size: 10px; color: var(--text3); background: var(--bg); padding-left: 4px; }
+    .weekly-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .weekly-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+    .weekly-stat-val { font-size: 22px; font-weight: 500; color: var(--text); }
+    .weekly-stat-label { font-size: 12px; color: var(--text2); margin-top: 3px; }
 
     /* ── loading ── */
     .parsing-bar { height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); background-size: 200% 100%; animation: shimmer 1.2s infinite; display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999; }
@@ -209,25 +283,55 @@
 
   <!-- scrollable content -->
   <div class="content" id="content">
-    <!-- macro summary -->
-    <div class="summary-card">
-      <div class="ring-wrap">
-        <svg width="88" height="88" viewBox="0 0 88 88">
-          <circle cx="44" cy="44" r="36" fill="none" stroke="#222" stroke-width="7"/>
-          <circle id="ring-protein" cx="44" cy="44" r="36" fill="none" stroke="#60c8f0" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
-          <circle id="ring-carbs" cx="44" cy="44" r="36" fill="none" stroke="#f0c060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
-          <circle id="ring-fat" cx="44" cy="44" r="36" fill="none" stroke="#f06060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
-          <circle id="ring-cal" cx="44" cy="44" r="36" fill="none" stroke="#c8f060" stroke-width="7" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-cal" id="total-cal">0</div>
-          <div class="ring-label">kcal</div>
+    <!-- budget card: calories remaining + macro progress -->
+    <div class="budget-card">
+      <div class="budget-top">
+        <div>
+          <div class="budget-remaining" id="budget-remaining">2000</div>
+          <div class="budget-label">kcal remaining today</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="budget-consumed"><span id="total-cal">0</span> eaten</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="budget-goal-label">of 2000 goal</div>
         </div>
       </div>
-      <div class="macro-list">
-        <div class="macro-row"><div class="macro-dot" style="background:#60c8f0"></div><span class="macro-name">Protein</span><span class="macro-val" id="total-protein">0</span><span class="macro-unit">g</span></div>
-        <div class="macro-row"><div class="macro-dot" style="background:#f0c060"></div><span class="macro-name">Carbs</span><span class="macro-val" id="total-carbs">0</span><span class="macro-unit">g</span></div>
-        <div class="macro-row"><div class="macro-dot" style="background:#f06060"></div><span class="macro-name">Fat</span><span class="macro-val" id="total-fat">0</span><span class="macro-unit">g</span></div>
+      <div class="budget-bar-wrap">
+        <div class="budget-bar-fill" id="budget-bar" style="width:0%"></div>
+      </div>
+      <div class="budget-macros">
+        <div class="budget-macro">
+          <div class="budget-macro-val"><span id="total-protein">0</span><span style="font-size:11px;color:var(--text3);">g</span></div>
+          <div class="budget-macro-bar"><div class="budget-macro-fill" id="bar-protein" style="width:0%;background:#60c8f0"></div></div>
+          <div class="budget-macro-label">protein <span id="goal-protein-label" style="color:var(--text3)"></span></div>
+        </div>
+        <div class="budget-macro">
+          <div class="budget-macro-val"><span id="total-carbs">0</span><span style="font-size:11px;color:var(--text3);">g</span></div>
+          <div class="budget-macro-bar"><div class="budget-macro-fill" id="bar-carbs" style="width:0%;background:#f0c060"></div></div>
+          <div class="budget-macro-label">carbs</div>
+        </div>
+        <div class="budget-macro">
+          <div class="budget-macro-val"><span id="total-fat">0</span><span style="font-size:11px;color:var(--text3);">g</span></div>
+          <div class="budget-macro-bar"><div class="budget-macro-fill" id="bar-fat" style="width:0%;background:#f06060"></div></div>
+          <div class="budget-macro-label">fat</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- streak + weekly -->
+    <div class="streak-row">
+      <div class="streak-card">
+        <div class="streak-icon">🔥</div>
+        <div>
+          <div class="streak-num" id="streak-num">0</div>
+          <div class="streak-sub">day streak</div>
+        </div>
+      </div>
+      <div class="streak-card" style="cursor:pointer;" onclick="openWeekly()">
+        <div class="streak-icon">📊</div>
+        <div>
+          <div class="streak-num" id="weekly-avg">—</div>
+          <div class="streak-sub">7-day avg kcal</div>
+        </div>
       </div>
     </div>
 
@@ -304,6 +408,10 @@
         <label>Water goal (glasses)</label>
         <input type="number" id="goal-water" value="8" />
       </div>
+      <div class="settings-row">
+        <label>Protein goal (g) — aim for 1.6–2g per kg of bodyweight</label>
+        <input type="number" id="goal-protein" value="120" />
+      </div>
     </div>
     <button class="settings-save-btn" onclick="saveSettings()">Save settings</button>
     <div class="status-msg" id="settings-status"></div>
@@ -366,12 +474,53 @@
   <div class="history-body" id="history-body"></div>
 </div>
 
+<!-- weekly chart overlay -->
+<div class="weekly-overlay" id="weekly-overlay">
+  <div class="weekly-header">
+    <div class="weekly-back" onclick="closeWeekly()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="weekly-title">This week</div>
+  </div>
+  <div class="weekly-body" id="weekly-body"></div>
+</div>
+
+<!-- past day log overlay -->
+<div class="pastlog-overlay" id="pastlog-overlay">
+  <div class="pastlog-header">
+    <div class="pastlog-back" onclick="closePastLog()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="pastlog-title">
+      <div class="pastlog-title-main" id="pastlog-title-main">Log food</div>
+      <div class="pastlog-title-sub" id="pastlog-title-sub"></div>
+    </div>
+  </div>
+  <div class="pastlog-body" id="pastlog-body"></div>
+  <div class="pastlog-input-area">
+    <div class="pastlog-meal-row" id="pastlog-meal-row">
+      <button class="pastlog-meal-btn active" onclick="selectPastMeal('Breakfast',this)">Breakfast</button>
+      <button class="pastlog-meal-btn" onclick="selectPastMeal('Lunch',this)">Lunch</button>
+      <button class="pastlog-meal-btn" onclick="selectPastMeal('Dinner',this)">Dinner</button>
+      <button class="pastlog-meal-btn" onclick="selectPastMeal('Snack',this)">Snack</button>
+    </div>
+    <div class="pastlog-row">
+      <input class="pastlog-input" id="pastlog-input" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')submitPastLog()" />
+      <button class="pastlog-send" onclick="submitPastLog()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="pastlog-status" id="pastlog-status"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script>
 // ── state ──
 let apiKey = localStorage.getItem('nourish_key') || '';
 let goalCal = parseInt(localStorage.getItem('nourish_goal_cal') || '2000');
 let goalWater = parseInt(localStorage.getItem('nourish_goal_water') || '8');
+let goalProtein = parseInt(localStorage.getItem('nourish_goal_protein') || '120');
 let currentMeal = 'Breakfast';
 let waterCount = 0;
 let entries = [];
@@ -379,14 +528,21 @@ let recognition = null;
 let isRecording = false;
 let scanReader = null;
 let scanStream = null;
+let pastLogDate = null;
+let pastLogMeal = 'Breakfast';
 
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 // ── init ──
 document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 if (apiKey) document.getElementById('settings-key').value = apiKey;
+document.getElementById('goal-cal').value = goalCal;
+document.getElementById('goal-water').value = goalWater;
+document.getElementById('goal-protein').value = goalProtein;
 loadDay();
 renderAll();
+renderStreak();
+renderWeeklyAvg();
 
 // ── persistence ──
 function todayKey() { return 'nourish_' + new Date().toISOString().slice(0,10); }
@@ -419,19 +575,39 @@ function renderSummary() {
     fat: a.fat + (e.fat||0)
   }), {cal:0,protein:0,carbs:0,fat:0});
 
-  document.getElementById('total-cal').textContent = Math.round(totals.cal);
+  const cal = Math.round(totals.cal);
+  const remaining = goalCal - cal;
+  const pct = Math.min(cal / goalCal * 100, 100);
+
+  // budget remaining
+  const remEl = document.getElementById('budget-remaining');
+  remEl.textContent = Math.abs(remaining);
+  remEl.className = 'budget-remaining' + (remaining < 0 ? ' danger' : remaining < goalCal * 0.1 ? ' warning' : '');
+  document.getElementById('budget-label') && (document.getElementById('budget-label').textContent = remaining < 0 ? 'kcal over budget' : 'kcal remaining today');
+  document.querySelector('.budget-label').textContent = remaining < 0 ? 'kcal over budget' : 'kcal remaining today';
+  document.getElementById('total-cal').textContent = cal;
+  document.getElementById('budget-goal-label').textContent = `of ${goalCal} goal`;
+
+  // budget bar
+  const bar = document.getElementById('budget-bar');
+  bar.style.width = pct.toFixed(1) + '%';
+  bar.className = 'budget-bar-fill' + (pct >= 100 ? ' danger' : pct >= 90 ? ' warning' : '');
+
+  // macros
   document.getElementById('total-protein').textContent = Math.round(totals.protein);
   document.getElementById('total-carbs').textContent = Math.round(totals.carbs);
   document.getElementById('total-fat').textContent = Math.round(totals.fat);
 
-  const circ = 226;
-  const pct = Math.min(totals.cal / goalCal, 1);
-  document.getElementById('ring-cal').style.strokeDashoffset = Math.round(circ - pct * circ);
+  // protein bar vs goal (feature 3)
+  const proteinPct = Math.min(totals.protein / goalProtein * 100, 100);
+  document.getElementById('bar-protein').style.width = proteinPct.toFixed(1) + '%';
+  document.getElementById('goal-protein-label').textContent = `/ ${goalProtein}g`;
 
-  const totalMacroG = totals.protein + totals.carbs + totals.fat || 1;
-  document.getElementById('ring-protein').style.strokeDashoffset = Math.round(circ - (totals.protein/totalMacroG)*circ*0.9);
-  document.getElementById('ring-carbs').style.strokeDashoffset = Math.round(circ - (totals.carbs/totalMacroG)*circ*0.85);
-  document.getElementById('ring-fat').style.strokeDashoffset = Math.round(circ - (totals.fat/totalMacroG)*circ*0.8);
+  // carbs & fat bars — relative to cal-implied targets
+  const carbTarget = Math.round(goalCal * 0.4 / 4);
+  const fatTarget = Math.round(goalCal * 0.3 / 9);
+  document.getElementById('bar-carbs').style.width = Math.min(totals.carbs / carbTarget * 100, 100).toFixed(1) + '%';
+  document.getElementById('bar-fat').style.width = Math.min(totals.fat / fatTarget * 100, 100).toFixed(1) + '%';
 }
 
 function renderWater() {
@@ -504,10 +680,14 @@ function saveSettings() {
   if (key) { apiKey = key; localStorage.setItem('nourish_key', key); }
   goalCal = parseInt(document.getElementById('goal-cal').value) || 2000;
   goalWater = parseInt(document.getElementById('goal-water').value) || 8;
+  goalProtein = parseInt(document.getElementById('goal-protein').value) || 120;
   localStorage.setItem('nourish_goal_cal', goalCal);
   localStorage.setItem('nourish_goal_water', goalWater);
+  localStorage.setItem('nourish_goal_protein', goalProtein);
   showSettingsStatus('Saved!', true);
   renderAll();
+  renderStreak();
+  renderWeeklyAvg();
 }
 function showSettingsStatus(msg, ok) {
   const el = document.getElementById('settings-status');
@@ -834,18 +1014,27 @@ function renderHistory() {
   keys.sort().reverse();
 
   if (keys.length === 0) {
-    body.innerHTML = '<div class="history-empty">No past days logged yet</div>';
+    body.innerHTML = '<div class="history-empty">No past days yet — start logging today!</div>';
     return;
   }
+
+  // also show last 7 days even if empty so user can backfill
+  const shown = new Set(keys.map(k => k.replace('nourish_','')));
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    if (!shown.has(ds)) { shown.add(ds); keys.push('nourish_' + ds); }
+  }
+  keys.sort().reverse();
 
   let html = '';
   keys.forEach(key => {
     const dateStr = key.replace('nourish_', '');
     const isToday = dateStr === new Date().toISOString().slice(0,10);
+    if (isToday) return; // today is shown on main screen
     const d = JSON.parse(localStorage.getItem(key) || '{}');
     const dayEntries = d.entries || [];
     const water = d.water || 0;
-    if (dayEntries.length === 0 && water === 0) return;
 
     const totals = dayEntries.reduce((a, e) => ({
       cal: a.cal + (e.calories||0),
@@ -861,10 +1050,10 @@ function renderHistory() {
       <div class="history-day-header">
         <div>
           <div class="history-day-date">${label}</div>
-          <div class="history-day-meta">${dayEntries.length} item${dayEntries.length !== 1 ? 's' : ''} · 💧 ${water}</div>
+          <div class="history-day-meta">${dayEntries.length ? `${dayEntries.length} item${dayEntries.length !== 1 ? 's' : ''} · 💧 ${water}` : 'No entries'}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <div class="history-day-cal">${Math.round(totals.cal)} kcal</div>
+          <div class="history-day-cal">${dayEntries.length ? Math.round(totals.cal) + ' kcal' : ''}</div>
           <svg class="history-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
@@ -872,11 +1061,12 @@ function renderHistory() {
 
     dayEntries.forEach(e => {
       html += `<div class="history-entry-row">
-        <div>
+        <div style="flex:1;">
           <div class="history-entry-name">${e.name}</div>
           <div class="history-entry-meal">${e.meal} · ${e.portion||''}</div>
         </div>
         <div class="history-entry-cal">${Math.round(e.calories||0)} kcal</div>
+        <span class="history-del" onclick="deleteHistoryEntry('${dateStr}',${e.id},event)">✕</span>
       </div>`;
     });
 
@@ -885,6 +1075,10 @@ function renderHistory() {
       <div class="history-macro">C <span>${Math.round(totals.carbs)}g</span></div>
       <div class="history-macro">F <span>${Math.round(totals.fat)}g</span></div>
     </div>
+    <button class="history-add-btn" onclick="openPastLog('${dateStr}',event)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add entry
+    </button>
     </div></div>`;
   });
 
@@ -894,6 +1088,245 @@ function renderHistory() {
 function toggleHistoryDay(dateStr) {
   const el = document.getElementById('hday-' + dateStr);
   if (el) el.classList.toggle('expanded');
+}
+
+function deleteHistoryEntry(dateStr, id, event) {
+  event.stopPropagation();
+  const key = 'nourish_' + dateStr;
+  const d = JSON.parse(localStorage.getItem(key) || '{}');
+  d.entries = (d.entries || []).filter(e => e.id !== id);
+  localStorage.setItem(key, JSON.stringify(d));
+  // refresh today if needed
+  if (dateStr === new Date().toISOString().slice(0,10)) { loadDay(); renderAll(); }
+  renderHistory();
+}
+
+function openPastLog(dateStr, event) {
+  event.stopPropagation();
+  pastLogDate = dateStr;
+  pastLogMeal = 'Breakfast';
+  const date = new Date(dateStr + 'T12:00:00');
+  document.getElementById('pastlog-title-main').textContent = 'Add to ' + date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  document.getElementById('pastlog-title-sub').textContent = 'Entries will be saved to this day';
+  document.getElementById('pastlog-input').value = '';
+  document.getElementById('pastlog-status').textContent = '';
+  document.querySelectorAll('.pastlog-meal-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  renderPastLogEntries();
+  document.getElementById('pastlog-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('pastlog-input').focus(), 300);
+}
+
+function closePastLog() {
+  document.getElementById('pastlog-overlay').classList.remove('open');
+  renderHistory();
+}
+
+function selectPastMeal(meal, btn) {
+  pastLogMeal = meal;
+  document.querySelectorAll('.pastlog-meal-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderPastLogEntries() {
+  const key = 'nourish_' + pastLogDate;
+  const d = JSON.parse(localStorage.getItem(key) || '{}');
+  const dayEntries = d.entries || [];
+  const body = document.getElementById('pastlog-body');
+  if (dayEntries.length === 0) {
+    body.innerHTML = '<div style="text-align:center;padding:32px 20px;color:var(--text3);font-size:14px;">No entries yet for this day</div>';
+    return;
+  }
+  const MEALS = ['Breakfast','Lunch','Dinner','Snack'];
+  let html = '';
+  MEALS.forEach(meal => {
+    const me = dayEntries.filter(e => e.meal === meal);
+    if (!me.length) return;
+    html += `<div style="font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin:12px 0 6px;">${meal}</div>`;
+    me.forEach(e => {
+      html += `<div class="entry-card">
+        <div class="entry-left">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-portion">${e.portion||''}</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-cal">${Math.round(e.calories||0)} kcal</div>
+          <div class="entry-macros">P ${Math.round(e.protein||0)}g · C ${Math.round(e.carbs||0)}g · F ${Math.round(e.fat||0)}g</div>
+          <span class="entry-del" onclick="deletePastEntry(${e.id})">remove</span>
+        </div>
+      </div>`;
+    });
+  });
+  body.innerHTML = html;
+}
+
+function deletePastEntry(id) {
+  const key = 'nourish_' + pastLogDate;
+  const d = JSON.parse(localStorage.getItem(key) || '{}');
+  d.entries = (d.entries || []).filter(e => e.id !== id);
+  localStorage.setItem(key, JSON.stringify(d));
+  if (pastLogDate === new Date().toISOString().slice(0,10)) { loadDay(); renderAll(); }
+  renderPastLogEntries();
+}
+
+async function submitPastLog() {
+  const input = document.getElementById('pastlog-input');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!apiKey) { document.getElementById('pastlog-status').textContent = 'Enter API key in Settings first'; return; }
+  input.value = '';
+  document.getElementById('pastlog-status').textContent = 'Analyzing...';
+  showLoading(true);
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: `You are a nutrition expert. Parse this food description and return ONLY a valid JSON object with no markdown, no backticks, no explanation:
+{"name":"concise food name","portion":"serving description","calories":number,"protein":number,"carbs":number,"fat":number}
+All numbers must be integers. Estimate realistic values for the described portion.
+Food: "${text}"` }]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content[0].text.trim().replace(/```[a-z]*|```/g,'').trim();
+    const parsed = JSON.parse(raw);
+    // save to past day
+    const key = 'nourish_' + pastLogDate;
+    const d = JSON.parse(localStorage.getItem(key) || '{}');
+    if (!d.entries) d.entries = [];
+    d.entries.push({ ...parsed, meal: pastLogMeal, id: Date.now() });
+    localStorage.setItem(key, JSON.stringify(d));
+    // if it's today, also update live state
+    if (pastLogDate === new Date().toISOString().slice(0,10)) { loadDay(); renderAll(); }
+    document.getElementById('pastlog-status').textContent = `Added: ${parsed.name} (${parsed.calories} kcal)`;
+    renderPastLogEntries();
+  } catch(e) {
+    document.getElementById('pastlog-status').textContent = 'Could not parse — try again';
+  }
+  showLoading(false);
+}
+
+// ── streak (feature 5) ──
+function renderStreak() {
+  let streak = 0;
+  const todayStr = new Date().toISOString().slice(0,10);
+  for (let i = 0; i <= 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    if (ds === todayStr && i === 0) { streak++; continue; }
+    const saved = localStorage.getItem('nourish_' + ds);
+    if (!saved) break;
+    const data = JSON.parse(saved);
+    if (!data.entries || data.entries.length === 0) break;
+    streak++;
+  }
+  document.getElementById('streak-num').textContent = streak;
+}
+
+// ── weekly avg (feature 4 teaser on main screen) ──
+function renderWeeklyAvg() {
+  let total = 0, count = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const saved = localStorage.getItem('nourish_' + ds);
+    if (saved) {
+      const data = JSON.parse(saved);
+      const dayCal = (data.entries||[]).reduce((a,e) => a+(e.calories||0), 0);
+      if (dayCal > 0) { total += dayCal; count++; }
+    }
+  }
+  document.getElementById('weekly-avg').textContent = count > 0 ? Math.round(total/count) : '—';
+}
+
+// ── weekly chart (feature 4) ──
+function openWeekly() {
+  renderWeeklyChart();
+  document.getElementById('weekly-overlay').classList.add('open');
+}
+function closeWeekly() {
+  document.getElementById('weekly-overlay').classList.remove('open');
+}
+
+function renderWeeklyChart() {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const saved = localStorage.getItem('nourish_' + ds);
+    const data = saved ? JSON.parse(saved) : {};
+    const cal = (data.entries||[]).reduce((a,e) => a+(e.calories||0), 0);
+    const protein = (data.entries||[]).reduce((a,e) => a+(e.protein||0), 0);
+    days.push({ ds, cal: Math.round(cal), protein: Math.round(protein), isToday: i===0,
+      label: i===0 ? 'Today' : d.toLocaleDateString('en-US',{weekday:'short'}) });
+  }
+
+  const maxCal = Math.max(...days.map(d=>d.cal), goalCal, 100);
+  const totalCal = days.reduce((a,d)=>a+d.cal,0);
+  const daysLogged = days.filter(d=>d.cal>0).length;
+  const avgCal = daysLogged ? Math.round(totalCal/daysLogged) : 0;
+  const avgProtein = daysLogged ? Math.round(days.reduce((a,d)=>a+d.protein,0)/daysLogged) : 0;
+  const deficit = daysLogged ? Math.round((goalCal - avgCal) * 7) : 0;
+
+  const goalPct = (goalCal / maxCal * 100).toFixed(1);
+
+  let barsHtml = days.map(d => {
+    const h = d.cal > 0 ? Math.max((d.cal/maxCal*100),2).toFixed(1) : 2;
+    const cls = d.cal === 0 ? 'empty' : d.isToday ? 'today' : d.cal > goalCal ? 'over' : 'good';
+    const calLabel = d.cal > 0 ? d.cal : '';
+    return `<div class="weekly-bar-wrap">
+      <div class="weekly-bar-col">
+        <div class="weekly-bar-cal">${calLabel}</div>
+        <div class="weekly-bar ${cls}" style="height:${h}%"></div>
+      </div>
+      <div class="weekly-day-label">${d.label}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('weekly-body').innerHTML = `
+    <div style="position:relative;margin-bottom:4px;">
+      <div class="weekly-chart">${barsHtml}</div>
+      <div class="weekly-goal-line" style="bottom:${goalPct}%;position:absolute;left:0;right:0;">
+        <span>goal ${goalCal}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:2px;background:#60c8f0"></div>Under goal</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>Today</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);"><div style="width:10px;height:10px;border-radius:2px;background:var(--red)"></div>Over goal</div>
+    </div>
+    <div class="weekly-stats">
+      <div class="weekly-stat">
+        <div class="weekly-stat-val">${avgCal || '—'}</div>
+        <div class="weekly-stat-label">avg kcal / day</div>
+      </div>
+      <div class="weekly-stat">
+        <div class="weekly-stat-val">${daysLogged}/7</div>
+        <div class="weekly-stat-label">days logged</div>
+      </div>
+      <div class="weekly-stat">
+        <div class="weekly-stat-val">${avgProtein || '—'}g</div>
+        <div class="weekly-stat-label">avg protein / day</div>
+      </div>
+      <div class="weekly-stat">
+        <div class="weekly-stat-val" style="color:${deficit>0?'var(--accent)':'var(--red)'};">${deficit > 0 ? '-' : '+'}${Math.abs(deficit)}</div>
+        <div class="weekly-stat-label">weekly ${deficit>0?'deficit':'surplus'} kcal</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text2);line-height:1.6;">
+      ${deficit > 3500 ? '🔥 Great week — you\'re on track to lose about ' + (deficit/7700).toFixed(1) + 'kg this week.' :
+        deficit > 0 ? '✅ You\'re in a deficit — keep it consistent and the weight will follow.' :
+        daysLogged === 0 ? '📝 No data yet this week — start logging to see your progress.' :
+        '⚠️ You\'re slightly over your weekly budget. A few smaller meals will get you back on track.'}
+    </div>`;
 }
 
 // ── service worker ──
